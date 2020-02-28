@@ -1,11 +1,14 @@
 // Load Environment Variables from the .env file
 require('dotenv').config();
 
+
 // Application Dependencies
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const client = require('./lib/client.js');
+const request = require('superagent');
+
 // Initiate database connection
 client.connect();
 
@@ -56,13 +59,38 @@ app.use('/api', ensureAuth);
 
 //API ROUTES!!!
 app.get('/api', (req, res) => {
-    res.send('Hello there!');
+    res.send('hello josh...');
+});
+
+app.get('/api/search/quotes', async(req, respond, next) => {
+    try { //look at the query params and location
+        const query = req.query.search; 
+        console.log(req.query.search);
+        //hide the key
+        const result = await request.get(`https://futuramaapi.herokuapp.com/api/quotes?search=${query}`);
+    
+        respond.json(result.body);
+    } catch (err) {
+        next(err);
+    }
+});
+
+app.get('/api/search/characters', async(req, respond, next) => {
+    try { //look at the query params and location
+        const query = req.query.search; 
+        console.log(req.query.search);
+        //hide the key
+        const result = await request.get(`https://futuramaapi.herokuapp.com/api/v2/characters?search=${query}`);
+    
+        respond.json(result.body);
+    } catch (err) {
+        next(err);
+    }
 });
 
 app.get('*', (req, res) => {
     res.send('404 error... ಠ_ಠ  you done goofed! (ง •̀_•́)ง ');
 });
-
 
 // Start the server
 app.listen(process.env.PORT, () => {
