@@ -75,6 +75,71 @@ app.get('/api/search/quotes', async(req, respond, next) => {
     }
 });
 
+app.get('/api/favorites', async(req, res) => {
+    try {
+        const myQuery = `
+            SELECT * FROM favorites
+            WHERE user_id=$1
+        `;
+        
+        const favorites = await client.query(myQuery, [req.userId]);
+        
+        res.json(favorites.rows);
+
+    } catch (e) {
+        console.error(e);
+    }
+});
+
+app.delete('/api/favorites/:id', async(req, res) => {
+    try {
+        const myQuery = `
+            DELETE FROM favorites
+            WHERE id=$1
+            RETURNING *
+        `;
+        
+        const favorites = await client.query(myQuery, [req.params.id]);
+        
+        res.json(favorites.rows);
+
+    } catch (e) {
+        console.error(e);
+    }
+});
+
+app.post('/api/favorites', async(req, res) => {
+    try {
+        const {
+            name,
+            age,
+            species,
+            pic_url,
+        } = req.body;
+
+        const newFavorites = await client.query(`
+            INSERT INTO favorites (name, age, species, pic_url, user_id)
+            values ($1, $2, $3, $4, $5)
+            returning *
+        `, [
+            name,
+            age,
+            species,
+            pic_url, 
+            req.userId,
+        ]);
+
+        res.json(newFavorites.rows[0]);
+
+    } catch (e) {
+        console.error(e);
+    }
+});
+
+
+
+
+
 app.get('/api/search/characters', async(req, respond, next) => {
     try { //look at the query params and location
         const query = req.query.search; 

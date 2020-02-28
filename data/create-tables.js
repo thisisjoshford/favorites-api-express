@@ -18,7 +18,8 @@ async function run() {
                 name VARCHAR(100) NOT NULL,
                 age INTEGER NOT NULL,
                 species VARCHAR(256) NOT NULL,
-                pic_url VARCHAR(256) NOT NULL
+                pic_url VARCHAR(256) NOT NULL,
+                user_id INTEGER NOT NULL REFERENCES users(id)
             );
         `);
 
